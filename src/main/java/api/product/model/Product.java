@@ -42,4 +42,23 @@ public class Product {
     public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Product product = (Product) obj;
+
+        return this.name.equalsIgnoreCase(product.getName())
+                && this.quantity == product.getQuantity().longValue();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.name.hashCode() + this.quantity.hashCode();
+    }
 }

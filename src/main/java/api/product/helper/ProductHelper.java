@@ -6,22 +6,21 @@ import api.product.model.ProductCategoryDb;
 import api.product.model.ProductDb;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class ProductHelper {
 
-    public Set<ProductCategory> getAllEnrichedProductsByCategory(List<ProductDb> productDbs, List<ProductCategoryDb> productCategoriesDb) {
+    public List<ProductCategory> getAllEnrichedProductsByCategory(List<ProductDb> productDbs, List<ProductCategoryDb> productCategoriesDb) {
 
-        Set<Product> products = getAllEnrichedProducts(productDbs);
+        List<Product> products = getAllEnrichedProducts(productDbs);
 
         return getAllEnrichedProductCategories(productCategoriesDb, products);
     }
 
-    private Set<ProductCategory> getAllEnrichedProductCategories(List<ProductCategoryDb> productCategoriesDb, Set<Product> products) {
-        Set<ProductCategory> productCategories = new HashSet<>();
+    private List<ProductCategory> getAllEnrichedProductCategories(List<ProductCategoryDb> productCategoriesDb, List<Product> products) {
+        List<ProductCategory> productCategories = new ArrayList<>();
         for(ProductCategoryDb productCategoryDb : productCategoriesDb) {
             ProductCategory productCategory = new ProductCategory();
             productCategory.setId(productCategoryDb.getId());
@@ -31,7 +30,7 @@ public class ProductHelper {
         }
 
         for(ProductCategory productCategory : productCategories) {
-            Set<Product> categoryBasedProducts = new HashSet<>();
+            List<Product> categoryBasedProducts = new ArrayList<>();
             for(Product product : products) {
                 if(productCategory.getId().equals(product.getCategoryId())) {
                     categoryBasedProducts.add(product);
@@ -43,8 +42,8 @@ public class ProductHelper {
         return productCategories;
     }
 
-    private Set<Product> getAllEnrichedProducts(List<ProductDb> productDbs) {
-        Set<Product> products = new HashSet<>();
+    private List<Product> getAllEnrichedProducts(List<ProductDb> productDbs) {
+        List<Product> products = new ArrayList<>();
 
         for(ProductDb productDb : productDbs) {
             products.add(getEnrichedProduct(productDb));

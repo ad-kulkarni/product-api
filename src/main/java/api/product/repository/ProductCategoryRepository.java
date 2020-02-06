@@ -37,7 +37,13 @@ public class ProductCategoryRepository {
     }
 
     public void createProductCategory(ProductCategoryDb productCategoryDb) {
-        jdbcTemplate.update("insert into product_category (name) values(?)", new Object[]{productCategoryDb.getName()});
+        ProductCategoryDb existingProductCategory = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productCategoryDb.getName()}, new BeanPropertyRowMapper<>(ProductCategoryDb.class));
+        if(existingProductCategory != null) {
+            productCategoryDb.setId(existingProductCategory.getId());
+            updateProductCategory(productCategoryDb);
+        } else {
+            jdbcTemplate.update("insert into product_category (name) values(?)", new Object[]{productCategoryDb.getName()});
+        }
     }
 
     public void updateProductCategory(ProductCategoryDb productCategoryDb) {

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 public class ProductController {
@@ -32,7 +31,7 @@ public class ProductController {
     private ProductHelper productHelper;
 
     @GetMapping("/api/products")
-    public Set<ProductCategory> getAllProducts() {
+    public List<ProductCategory> getAllProducts() {
 
         List<ProductDb> productDbs = productService.getAllProducts();
 

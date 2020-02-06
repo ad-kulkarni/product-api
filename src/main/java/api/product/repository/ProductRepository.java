@@ -56,7 +56,13 @@ public class ProductRepository {
             logger.error("Product category does not exist!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
         }
-        jdbcTemplate.update("insert into product (name, category_id, quantity) values(?, ?, ?)", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity()});
+        ProductDb existingProduct = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productDb.getName()}, new BeanPropertyRowMapper<>(ProductDb.class));
+        if(existingProduct != null) {
+            productDb.setId(existingProduct.getId());
+            updateProduct(productDb);
+        } else {
+            jdbcTemplate.update("insert into product (name, category_id, quantity) values(?, ?, ?)", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity()});
+        }
     }
 
     public void updateProduct(ProductDb productDb) {
@@ -65,7 +71,7 @@ public class ProductRepository {
             logger.error("Product does not exist, hence cannot be updated!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product does not exist, hence cannot be updated!");
         }
-        jdbcTemplate.update("update api.product set name = ?, category_id = ?, quantity = ? where id = ?", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity(), productDb.getId()});
+        jdbcTemplate.update("update product set name = ?, category_id = ?, quantity = ? where id = ?", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity(), productDb.getId()});
     }
 
     public void deleteProduct(Long productId) {
