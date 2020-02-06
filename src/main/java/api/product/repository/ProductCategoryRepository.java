@@ -1,8 +1,8 @@
 package api.product.repository;
 
 import api.product.model.ProductCategoryDb;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public class ProductCategoryRepository {
-    private Logger logger = LoggerFactory.getLogger(ProductRepository.class);
+    private Logger logger = LogManager.getLogger(ProductCategoryRepository.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -54,7 +54,7 @@ public class ProductCategoryRepository {
             logger.error("Product Category does not exist!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
         }
-        jdbcTemplate.update("delete from api.product where category_id = ?", new Object[]{categoryId});
+        jdbcTemplate.update("delete from product where category_id = ?", new Object[]{categoryId});
         jdbcTemplate.update("delete from product_category where id = ?", new Object[]{categoryId});
     }
 
