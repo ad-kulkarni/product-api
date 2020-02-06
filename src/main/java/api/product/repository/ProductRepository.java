@@ -5,6 +5,7 @@ import api.product.model.ProductDb;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -44,7 +45,7 @@ public class ProductRepository {
     public ProductDb getProductById(Long productId) {
         Optional<ProductDb> productDbOptional = productDbRepository.findById(productId);
         if(!productDbOptional.isPresent()) {
-            logger.error("Product not found!");
+            logger.error("Product not found for id:" + productId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found!");
         }
         return productDbOptional.get();
@@ -53,14 +54,16 @@ public class ProductRepository {
     public void createProduct(ProductDb productDb) {
         Optional<ProductCategoryDb> productCategoryDbOptional = productCategoryDbRepository.findById(productDb.getCategoryId());
         if(!productCategoryDbOptional.isPresent()) {
-            logger.error("Product category does not exist!");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
+            logger.error("Product category does not exist for category id:" + productDb.getCategoryId());
         }
-        ProductDb existingProduct = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productDb.getName()}, new BeanPropertyRowMapper<>(ProductDb.class));
-        if(existingProduct != null) {
-            productDb.setId(existingProduct.getId());
-            updateProduct(productDb);
-        } else {
+        try {
+            ProductDb existingProduct = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productDb.getName()}, new BeanPropertyRowMapper<>(ProductDb.class));
+            if(existingProduct != null) {
+                logger.info("Product with name " + productDb.getName() + " already exists!");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Product with name " + productDb.getName() + " already exists!");
+            }
+        } catch (IncorrectResultSizeDataAccessException e) {
+            logger.info("Creating new product record");
             jdbcTemplate.update("insert into product (name, category_id, quantity) values(?, ?, ?)", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity()});
         }
     }
@@ -81,5 +84,17 @@ public class ProductRepository {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found!");
         }
         jdbcTemplate.update("delete from product where id = ?", new Object[]{productId});
+    }
+
+    public void setProductDbRepository(ProductDbRepository productDbRepository) {
+        this.productDbRepository = productDbRepository;
+    }
+
+    public void setProductCategoryDbRepository(ProductCategoryDbRepository productCategoryDbRepository) {
+        this.productCategoryDbRepository = productCategoryDbRepository;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }

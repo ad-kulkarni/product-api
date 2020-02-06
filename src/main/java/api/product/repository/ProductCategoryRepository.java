@@ -4,6 +4,7 @@ import api.product.model.ProductCategoryDb;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,18 +31,22 @@ public class ProductCategoryRepository {
     public ProductCategoryDb getProductCategoryById(Long categoryId) {
         Optional<ProductCategoryDb> productCategoryDbOptional = productCategoryDbRepository.findById(categoryId);
         if(!productCategoryDbOptional.isPresent()) {
-            logger.error("Product Category not found!");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category not found!");
+            logger.error("Product Category not found for id:" + categoryId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category not found for id:" + categoryId);
         }
         return productCategoryDbOptional.get();
     }
 
     public void createProductCategory(ProductCategoryDb productCategoryDb) {
-        ProductCategoryDb existingProductCategory = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productCategoryDb.getName()}, new BeanPropertyRowMapper<>(ProductCategoryDb.class));
-        if(existingProductCategory != null) {
-            productCategoryDb.setId(existingProductCategory.getId());
-            updateProductCategory(productCategoryDb);
-        } else {
+        try{
+            ProductCategoryDb existingProductCategory = jdbcTemplate.queryForObject("select * from product where name = ?", new Object[]{productCategoryDb.getName()}, new BeanPropertyRowMapper<>(ProductCategoryDb.class));
+
+            if(existingProductCategory != null) {
+                logger.info("Product Category with name " + productCategoryDb.getName() + " already exists!");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Product Category with name " + productCategoryDb.getName() + " already exists!");
+            }
+        } catch (IncorrectResultSizeDataAccessException e) {
+            logger.info("Creating new product category record");
             jdbcTemplate.update("insert into product_category (name) values(?)", new Object[]{productCategoryDb.getName()});
         }
     }
@@ -57,8 +62,8 @@ public class ProductCategoryRepository {
     public void deleteProductCategory(Long categoryId) {
         Optional<ProductCategoryDb> productCategoryDbOptional = productCategoryDbRepository.findById(categoryId);
         if(!productCategoryDbOptional.isPresent()) {
-            logger.error("Product Category does not exist!");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
+            logger.error("Product Category not found for id:" + categoryId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category not found for id:" + categoryId);
         }
         jdbcTemplate.update("delete from product where category_id = ?", new Object[]{categoryId});
         jdbcTemplate.update("delete from product_category where id = ?", new Object[]{categoryId});

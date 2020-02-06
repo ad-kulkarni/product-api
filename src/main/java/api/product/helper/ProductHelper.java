@@ -4,6 +4,7 @@ import api.product.model.Product;
 import api.product.model.ProductCategory;
 import api.product.model.ProductCategoryDb;
 import api.product.model.ProductDb;
+import api.product.model.ProductWrapper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,6 +12,13 @@ import java.util.List;
 
 @Component
 public class ProductHelper {
+
+    public ProductWrapper getAllProducts(List<ProductDb> productDbs, List<ProductCategoryDb> productCategoriesDb) {
+        ProductWrapper productWrapper = new ProductWrapper();
+        productWrapper.setCategories(getAllEnrichedProductsByCategory(productDbs, productCategoriesDb));
+
+        return productWrapper;
+    }
 
     public List<ProductCategory> getAllEnrichedProductsByCategory(List<ProductDb> productDbs, List<ProductCategoryDb> productCategoriesDb) {
 

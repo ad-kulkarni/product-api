@@ -2,9 +2,9 @@ package api.product.controller;
 
 import api.product.helper.ProductHelper;
 import api.product.model.Product;
-import api.product.model.ProductCategory;
 import api.product.model.ProductCategoryDb;
 import api.product.model.ProductDb;
+import api.product.model.ProductWrapper;
 import api.product.service.ProductCategoryService;
 import api.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +31,13 @@ public class ProductController {
     private ProductHelper productHelper;
 
     @GetMapping("/api/products")
-    public List<ProductCategory> getAllProducts() {
+    public ProductWrapper getAllProducts() {
 
         List<ProductDb> productDbs = productService.getAllProducts();
 
         List<ProductCategoryDb> productCategoriesDb = productCategoryService.getAllProductCategories();
 
-        return productHelper.getAllEnrichedProductsByCategory(productDbs, productCategoriesDb);
+        return productHelper.getAllProducts(productDbs, productCategoriesDb);
     }
 
     @GetMapping("/api/products/{productId}")
