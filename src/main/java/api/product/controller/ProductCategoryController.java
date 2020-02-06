@@ -54,4 +54,16 @@ public class ProductCategoryController {
     public void deleteProductCategory(@PathVariable Long categoryId) {
         productCategoryService.deleteProductCategory(categoryId);
     }
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
+
+    public void setProductCategoryService(ProductCategoryService productCategoryService) {
+        this.productCategoryService = productCategoryService;
+    }
+
+    public void setProductHelper(ProductHelper productHelper) {
+        this.productHelper = productHelper;
+    }
 }

@@ -54,7 +54,15 @@ public class ProductCategoryRepository {
             logger.error("Product Category does not exist!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
         }
-        jdbcTemplate.update("delete from product where category_id = ?", new Object[]{categoryId});
+        jdbcTemplate.update("delete from api.product where category_id = ?", new Object[]{categoryId});
         jdbcTemplate.update("delete from product_category where id = ?", new Object[]{categoryId});
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public void setProductCategoryDbRepository(ProductCategoryDbRepository productCategoryDbRepository) {
+        this.productCategoryDbRepository = productCategoryDbRepository;
     }
 }

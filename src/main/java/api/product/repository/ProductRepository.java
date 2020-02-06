@@ -38,7 +38,7 @@ public class ProductRepository {
             logger.error("Product Category not found!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category not found!");
         }
-        return jdbcTemplate.query("select * from product where category_id = ?", new Object[]{categoryId}, new BeanPropertyRowMapper<>(ProductDb.class));
+        return jdbcTemplate.query("select * from api.product where category_id = ?", new Object[]{categoryId}, new BeanPropertyRowMapper<>(ProductDb.class));
     }
 
     public ProductDb getProductById(Long productId) {
@@ -56,7 +56,7 @@ public class ProductRepository {
             logger.error("Product category does not exist!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Category does not exist!");
         }
-        jdbcTemplate.update("insert into product (name, category_id, quantity) values(?, ?, ?)", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity()});
+        jdbcTemplate.update("insert into api.product (name, category_id, quantity) values(?, ?, ?)", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity()});
     }
 
     public void updateProduct(ProductDb productDb) {
@@ -65,7 +65,7 @@ public class ProductRepository {
             logger.error("Product does not exist, hence cannot be updated!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product does not exist, hence cannot be updated!");
         }
-        jdbcTemplate.update("update product set name = ?, category_id = ?, quantity = ? where id = ?", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity(), productDb.getId()});
+        jdbcTemplate.update("update api.product set name = ?, category_id = ?, quantity = ? where id = ?", new Object[]{productDb.getName(), productDb.getCategoryId(), productDb.getQuantity(), productDb.getId()});
     }
 
     public void deleteProduct(Long productId) {
@@ -74,6 +74,6 @@ public class ProductRepository {
             logger.error("Product does not exist!");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found!");
         }
-        jdbcTemplate.update("delete from product where id = ?", new Object[]{productId});
+        jdbcTemplate.update("delete from api.product where id = ?", new Object[]{productId});
     }
 }

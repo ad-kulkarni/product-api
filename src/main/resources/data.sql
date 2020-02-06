@@ -32,5 +32,3 @@ INSERT INTO product (category_id, name, quantity) VALUES
   ('3', 'Shirts', '2000'),
   ('3', 'Pants', '3000'),
   ('3', 'Shoes', '3500');
-
--- add createdAt, updatedAt, deletedAt attributes
